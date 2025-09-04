@@ -5,6 +5,12 @@ set(UNIT_NAME GravitySandbox)
 
 set(SRCS
     src/main.cpp
+    src/body.cpp
+    src/simulation.cpp
+)
+set(HDRS
+    src/body.h
+    src/simulation.h
 )
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -12,8 +18,13 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-add_executable(${UNIT_NAME} ${SRCS})
+add_executable(${UNIT_NAME} ${HDRS} ${SRCS})
 
 add_subdirectory(raylib)
-target_link_libraries(${UNIT_NAME} PUBLIC raylib)
-target_include_directories(${UNIT_NAME} PUBLIC src PUBLIC raylib/src)
+add_subdirectory(glm)
+target_link_libraries(${UNIT_NAME} PUBLIC 
+    raylib 
+    glm::glm)
+target_include_directories(${UNIT_NAME} PUBLIC 
+    raylib/src 
+    glm)

@@ -1,3 +1,6 @@
 [submodule "raylib"]
 	path = raylib
 	url = git@github.com:raysan5/raylib.git
+[submodule "glm"]
+	path = glm
+	url = git@github.com:g-truc/glm.git
