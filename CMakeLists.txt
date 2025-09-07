@@ -5,12 +5,16 @@ set(UNIT_NAME GravitySandbox)
 
 set(SRCS
     src/main.cpp
-    src/body.cpp
-    src/simulation.cpp
+    src/bodies_holder.cpp
+    src/drawable_body.cpp
+    src/base/body.cpp
+    src/base/simulation.cpp
 )
 set(HDRS
-    src/body.h
-    src/simulation.h
+    src/bodies_holder.h
+    src/drawable_body.h
+    src/base/body.h
+    src/base/simulation.h
 )
 
 if(NOT CMAKE_BUILD_TYPE)
