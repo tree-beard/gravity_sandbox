@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "cmake",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "-S",
+        "${workspaceFolder}",
+        "-B",
+        "${workspaceFolder}/build",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DRELEASE_WITH_DSYM=ON",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DCMAKE_BINARY_DIR=${workspaceFolder}/build",
+        "-DEXECUTABLE_OUTPUT_PATH=${workspaceFolder}/build"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "CMake configure task for MacOS"
+    },
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "cmake --build ${workspaceFolder}/build --config Release --target GravitySandbox --parallel $(sysctl -n hw.ncpu)",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "dependsOn": "cmake",
+      "detail": "Build task (GravitySandbox only) for MacOS"
+    }
+  ]
+}

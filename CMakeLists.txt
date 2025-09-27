@@ -5,16 +5,19 @@ set(UNIT_NAME GravitySandbox)
 
 set(SRCS
     src/main.cpp
-    src/bodies_holder.cpp
+    src/bodies_generator.cpp
     src/drawable_body.cpp
-    src/base/body.cpp
-    src/base/simulation.cpp
+    src/physics/barnes_hut_simulation.cpp
+    src/physics/body.cpp
+    src/physics/simulation_controller.cpp
 )
 set(HDRS
-    src/bodies_holder.h
+    src/bodies_generator.h
     src/drawable_body.h
-    src/base/body.h
-    src/base/simulation.h
+    src/physics/barnes_hut_simulation.h
+    src/physics/body.h
+    src/physics/simulation_controller.h
+    src/base/quadtree.h
 )
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -31,4 +34,5 @@ target_link_libraries(${UNIT_NAME} PUBLIC
     glm::glm)
 target_include_directories(${UNIT_NAME} PUBLIC 
     raylib/src 
-    glm)
+    glm
+    src)

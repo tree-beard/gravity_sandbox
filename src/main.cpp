@@ -1,6 +1,6 @@
 #include <raylib.h>
-#include "bodies_holder.h"
-#include "base/simulation.h"
+#include "bodies_generator.h"
+#include "physics/simulation_controller.h"
 #include "drawable_body.h"
 
 //------------------------------------------------------------------------------------
@@ -10,7 +10,7 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 1280;
+    const int screenWidth = 720;
     const int screenHeight = 720;
 
     SetConfigFlags(FLAG_WINDOW_HIGHDPI);
@@ -20,19 +20,17 @@ int main(void)
 
     // Setup
     //--------------------------------------------------------------------------------------
-    auto bodiesHolder = std::make_unique<BodiesHolder>();
-    bodiesHolder->generateRandomBodies(1000);
+    auto bodies = BodiesGenerator::generateRandomBodies(10000);
 
     // Add a couple of heave bodies
-    auto bigBody = std::make_shared<DrawableBody>(glm::vec2(0.5 * screenWidth, 0.5 * screenHeight), glm::vec2(0,0), 100000, BLACK, 10);
-    auto anotherBigBody = std::make_shared<DrawableBody>(glm::vec2(0.5 * screenWidth + 200, 0.5 * screenHeight + 200), glm::vec2(0,0), 50000, DARKGRAY, 8);
-    bodiesHolder->addBody(anotherBigBody);
-    bodiesHolder->addBody(bigBody);
+    auto bigBody = std::make_shared<DrawableBody>(glm::vec2(0.5 * screenWidth, 0.5 * screenHeight), glm::vec2(0,0), 100000, BLACK, 7);
+    auto anotherBigBody = std::make_shared<DrawableBody>(glm::vec2(0.5 * screenWidth + 200, 0.5 * screenHeight + 200), glm::vec2(0,0), 50000, DARKGRAY, 4);
+    bodies.push_back(anotherBigBody);
+    bodies.push_back(bigBody);
 
     // Start simulation
-    auto bodies = bodiesHolder->getBodies();
-    auto simulation = std::make_unique<physics::Simulation>(bodies);
-    simulation->start();
+    auto simulation = std::make_unique<physics::SimulationController>(glm::vec2(screenWidth, screenHeight), bodies);
+    simulation->start(0.005);
 
     // Main game loop
     //--------------------------------------------------------------------------------------
