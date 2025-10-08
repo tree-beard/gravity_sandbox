@@ -1,10 +1,10 @@
 #include "drawable_body.h"
 #include <algorithm>
 
-DrawableBody::DrawableBody(glm::vec2 _pos, glm::vec2 _vel, float _mass, Color _color, float _radius)
-    : physics::Body(_pos, _vel, _mass)
-    , m_color(_color)
-    , m_radius(_radius) {
+DrawableBody::DrawableBody(glm::vec2 pos, glm::vec2 vel, float mass, float radius, Color color)
+    : physics::Body(pos, vel, mass)
+    , m_radius(radius)
+    , m_color(color) {
 }
 
 DrawableBody::~DrawableBody() {

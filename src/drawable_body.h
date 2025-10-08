@@ -6,13 +6,13 @@
 class DrawableBody : public physics::Body {
 
 public:
-    explicit DrawableBody(glm::vec2 _pos, glm::vec2 _vel, float _mass, Color _color, float _radius = 1.0f);
+    explicit DrawableBody(glm::vec2 pos, glm::vec2 vel, float mass, float radius, Color color);
     virtual ~DrawableBody();
 
     virtual void draw();
     float getRadius() const { return m_radius; }
 protected:
-    Color m_color {RED};
+    Color m_color {WHITE};
     float m_radius {1.0f};
 
 };
