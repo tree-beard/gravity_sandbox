@@ -15,15 +15,16 @@ void SimulationController::start(float dt) {
     m_running = true;
     m_workerThread = std::thread([this, dt]() mutable {
         std::chrono::high_resolution_clock::time_point lastFrameTimePoint = std::chrono::high_resolution_clock::now();
-        float finalDt = dt;
+        float realDt = dt;
         while (m_running) {
             // Update
-            if(dt == 0.0f) {
-                const auto now = std::chrono::high_resolution_clock::now();
-	            finalDt = static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(now - lastFrameTimePoint).count()) / 1000;
+            const auto now = std::chrono::high_resolution_clock::now();
+	        realDt = static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(now - lastFrameTimePoint).count()) / 1000;
+
+            if (realDt >= dt) {
                 lastFrameTimePoint = now;
+                update(dt);
             }
-	        update(finalDt);
         }
     });
 }

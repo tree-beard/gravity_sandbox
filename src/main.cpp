@@ -10,8 +10,8 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 720;
-    const int screenHeight = 720;
+    const int screenWidth = 1010;
+    const int screenHeight = 660;
 
     SetConfigFlags(FLAG_WINDOW_HIGHDPI);
     InitWindow(screenWidth, screenHeight, "gravity sandbox");
@@ -20,17 +20,17 @@ int main(void)
 
     // Setup
     //--------------------------------------------------------------------------------------
-    auto bodies = BodiesGenerator::generateRandomBodies(10000);
+    auto bodies = BodiesGenerator::generateRandomBodies(10000, screenWidth, screenHeight);
 
     // Add a couple of heave bodies
-    auto bigBody = std::make_shared<DrawableBody>(glm::vec2(0.5 * screenWidth, 0.5 * screenHeight), glm::vec2(0,0), 100000, BLACK, 7);
-    auto anotherBigBody = std::make_shared<DrawableBody>(glm::vec2(0.5 * screenWidth + 200, 0.5 * screenHeight + 200), glm::vec2(0,0), 50000, DARKGRAY, 4);
+    auto bigBody = std::make_shared<DrawableBody>(glm::vec2(0.5 * screenWidth, 0.5 * screenHeight), glm::vec2(0,0), 100000, 7, GOLD);
+    auto anotherBigBody = std::make_shared<DrawableBody>(glm::vec2(0.5 * screenWidth + 100, 0.5 * screenHeight + 100), glm::vec2(0,0), 10000, 4, RED);
     bodies.push_back(anotherBigBody);
     bodies.push_back(bigBody);
 
     // Start simulation
     auto simulation = std::make_unique<physics::SimulationController>(glm::vec2(screenWidth, screenHeight), bodies);
-    simulation->start(0.005);
+    simulation->start(0.01);
 
     // Main game loop
     //--------------------------------------------------------------------------------------
@@ -40,13 +40,13 @@ int main(void)
         //--------------------------------------------------------------------------------------
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+        ClearBackground(BLACK);
 
         for(auto body : bodies) {
             std::static_pointer_cast<DrawableBody>(body)->draw();
         }
         std::string header = "Gravity simulation for " + std::to_string(bodies.size()) + " bodies";
-        DrawText(header.c_str(), 10, 10, 20, DARKGRAY);
+        DrawText(header.c_str(), 10, 10, 20, GREEN);
         EndDrawing();
     }
 

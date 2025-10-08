@@ -4,7 +4,8 @@ namespace physics {
 
     const float G_CONST = 1.0f;//6.67430e-11;        // Gravitational constant
     const float THETA = 1.0f;            // Barnes-Hut opening angle
-    const float SOFT_FACTOR = 0.1f;   // Softening parameter to avoid singularities
+    const float SOFT_FACTOR = 0.5f;   // Softening parameter to avoid singularities
+    const float AREA_PADDING = 10.0f;
 
     // BHQuadtreeNode
     //--------------------------------------------------------------------------------------
@@ -93,7 +94,7 @@ namespace physics {
     //--------------------------------------------------------------------------------------
     BarnesHutSimulation::BarnesHutSimulation(glm::vec2 visualArea)
         : m_root(std::make_unique<BHQuadtreeNode>(
-            AABB(glm::vec2(visualArea.x / 2, visualArea.y / 2), std::max(visualArea.x / 2, visualArea.y / 2)))
+            AABB(glm::vec2(visualArea.x / 2, visualArea.y / 2), std::max(visualArea.x / 2, visualArea.y / 2) + AREA_PADDING))
             ) {
 
     }

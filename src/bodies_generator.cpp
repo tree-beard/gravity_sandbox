@@ -1,6 +1,8 @@
 #include "bodies_generator.h"
 #include "drawable_body.h"
+
 #include <random>
+#include <glm/gtc/random.hpp>
 
 glm::vec2 getRandomVec2(unsigned int seed, float min, float max) {
     static std::mt19937 gen(seed);
@@ -20,17 +22,17 @@ float getRandomFloat(unsigned int seed, float min, float max) {
     return dis(gen);
 }
 
-std::vector<std::shared_ptr<physics::Body>> BodiesGenerator::generateRandomBodies(size_t number) {
+std::vector<std::shared_ptr<physics::Body>> BodiesGenerator::generateRandomBodies(size_t number, float areaWidth, float areaHeight) {
     std::vector<std::shared_ptr<physics::Body>> bodies;
     bodies.reserve(number);
     for (auto i = 0; i < number; ++i) {
         const auto time = static_cast<int>(std::chrono::system_clock::now().time_since_epoch().count());
-        const auto pos = glm::vec2(getRandomFloat(time, 0, 1280), getRandomFloat(time, 0, 720));
-        const auto vel = getRandomVec2(time, -10, 10);
+        const auto pos = glm::diskRand(areaHeight / 2.0f) + glm::vec2(areaWidth, areaHeight) / 2.0f;
+        const auto vel = getRandomVec2(time, -5, 5);
         const auto mass = getRandomFloat(time, 10, 100);
-        const auto radius = getRandomFloat(time, 0.5, 2);
-        auto color = getRandomColor(time);
-        bodies.emplace_back(std::make_shared<DrawableBody>(pos, vel, mass, color, radius));
+        const auto radius = mass * 0.01;//getRandomFloat(time, 0.1, 1);
+        auto color = WHITE;
+        bodies.emplace_back(std::make_shared<DrawableBody>(pos, vel, mass, radius, color));
     }
     return bodies;
 }
