@@ -9,7 +9,7 @@
 namespace physics {
 
 // Quadtree Node for Barnes-Hut algorithm
-class BHQuadtreeNode : public QuadtreeNode<Body> {
+class BHQuadtreeNode : public QuadtreeNode<Body, BHQuadtreeNode> {
 
 public:
     explicit BHQuadtreeNode(const AABB& boundary);
@@ -31,10 +31,6 @@ private:
 
     // Insert a body and update mass properties
     virtual bool insert(const glm::vec2& point, std::shared_ptr<Body> data) override;
-
-    virtual std::unique_ptr<QuadtreeNode<Body>> createChildNode(const AABB& boundary) override {
-        return std::make_unique<BHQuadtreeNode>(boundary);
-    }
 
     // Update mass properties when inserting a body
     void updateMassProperties(const Body& newBody);
