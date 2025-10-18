@@ -12,7 +12,7 @@ namespace physics {
 class BHQuadtreeNode : public QuadtreeNode<Body, BHQuadtreeNode> {
 
 public:
-    explicit BHQuadtreeNode(const AABB& boundary);
+    using QuadtreeNode::QuadtreeNode;
     
     const AABB& getBoundary() const { return m_boundary; }
     bool isDivided() const { return m_divided; }
@@ -21,36 +21,26 @@ public:
     const std::shared_ptr<Body> getBody() const { return std::static_pointer_cast<Body>(m_data); }
     float getTotalMass() const { return m_totalMass; }
     void getCenterOfMass(float& x, float& y) const { x = m_centerOfMass.x; y = m_centerOfMass.y; }
-    // Barnes-Hut force calculation
-    void computeForce(Body& target, float theta, float G) const;
+    void computeForce(Body& target) const;
 
 private:
-    // Mass properties for Barnes-Hut approximation
+    virtual bool insert(const glm::vec2& point, std::shared_ptr<Body> data) override;
+    void updateMassProperties(const Body& newBody);
+    void addDirectForce(Body& target, const Body& source) const;
+    void addApproximateForce(Body& target, const glm::vec2& comPos, float mass, float distance) const;
+
     float m_totalMass {0.0};
     glm::vec2 m_centerOfMass {0.0, 0.0};
-
-    // Insert a body and update mass properties
-    virtual bool insert(const glm::vec2& point, std::shared_ptr<Body> data) override;
-
-    // Update mass properties when inserting a body
-    void updateMassProperties(const Body& newBody);
-
-    // Add direct force between two bodies
-    void addDirectForce(Body& target, const Body& source, float G) const;
-    
-    // Add approximate force from a cell
-    void addApproximateForce(Body& target, const glm::vec2& comPos, float mass, 
-                           float distance, float G) const;
 };
 
-class BarnesHutSimulation {
+class NBodySimulation {
 
 public:
-    explicit BarnesHutSimulation(glm::vec2 visualArea);
-    BarnesHutSimulation(BarnesHutSimulation&& other) noexcept;
-    BarnesHutSimulation(const BarnesHutSimulation&) = delete;
-    BarnesHutSimulation& operator=(const BarnesHutSimulation&) = delete;
-    ~BarnesHutSimulation() = default;
+    explicit NBodySimulation(glm::vec2 visualArea);
+    NBodySimulation(NBodySimulation&& other) noexcept;
+    NBodySimulation(const NBodySimulation&) = delete;
+    NBodySimulation& operator=(const NBodySimulation&) = delete;
+    ~NBodySimulation() = default;
 
     void setBodies(std::vector<std::shared_ptr<Body>>& bodies);
     void addBodie(std::shared_ptr<Body> body);
@@ -61,7 +51,6 @@ private:
 
     std::unique_ptr<BHQuadtreeNode> m_root;
     std::vector<std::shared_ptr<Body>> m_bodies;
-    
 };
 
 }

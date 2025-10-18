@@ -1,18 +1,14 @@
-#include "barnes_hut_simulation.h"
+#include "nbody_simulation.h"
 
 namespace physics {
 
-    const float G_CONST = 1.0f;//6.67430e-11;        // Gravitational constant
-    const float THETA = 1.0f;            // Barnes-Hut opening angle
-    const float SOFT_FACTOR = 0.5f;   // Softening parameter to avoid singularities
-    const float AREA_PADDING = 10.0f;
+    const float G = 1.0f;//6.67430e-11;         // Gravitational constant
+    const float THETA = 1.0f;                   // Barnes-Hut opening angle
+    const float SOFT_FACTOR = 0.5f;             // Softening parameter to avoid singularities
+    const float AREA_PADDING = 10.0f;           // Compute area internal padding
 
     // BHQuadtreeNode
     //--------------------------------------------------------------------------------------
-    BHQuadtreeNode::BHQuadtreeNode(const AABB& boundary) 
-        : QuadtreeNode(boundary) {
-
-    }
 
     bool BHQuadtreeNode::insert(std::shared_ptr<Body> body) {
         return insert(body->position(), body);
@@ -30,14 +26,15 @@ namespace physics {
         if (m_totalMass == 0) {
             m_totalMass = newBody.mass();
             m_centerOfMass = newBody.position();
-        } else {
+        } 
+        else {
             float newTotalMass = m_totalMass + newBody.mass();
             m_centerOfMass = ((m_centerOfMass * m_totalMass) + newBody.position() * newBody.mass()) / newTotalMass;
             m_totalMass = newTotalMass;
         }
     }
 
-    void BHQuadtreeNode::computeForce(Body& target, float theta, float G) const {
+    void BHQuadtreeNode::computeForce(Body& target) const {
         if (!m_divided) {
             if (!m_data) {
                 return;
@@ -46,7 +43,7 @@ namespace physics {
             if (m_data && *m_data == target) {
                 return;
             }
-            addDirectForce(target, *m_data, G);
+            addDirectForce(target, *m_data);
             return;
         }
         
@@ -54,21 +51,22 @@ namespace physics {
         const auto distance = std::sqrt(r.x * r.x + r.y * r.y);
         
         // Barnes-Hut criterion: s/d < theta
-        if (m_boundary.getWidth() / distance < theta) {
+        if (m_boundary.getWidth() / distance < THETA) {
             // Treat cell as a single mass
             if (m_totalMass > 0) {
-                addApproximateForce(target, m_centerOfMass, m_totalMass, distance, G);
+                addApproximateForce(target, m_centerOfMass, m_totalMass, distance);
             }
-        } else {
+        } 
+        else {
             // Recursively process children
-            static_cast<BHQuadtreeNode*>(m_nw.get())->computeForce(target, theta, G);
-            static_cast<BHQuadtreeNode*>(m_ne.get())->computeForce(target, theta, G);
-            static_cast<BHQuadtreeNode*>(m_sw.get())->computeForce(target, theta, G);
-            static_cast<BHQuadtreeNode*>(m_se.get())->computeForce(target, theta, G);
+            static_cast<BHQuadtreeNode*>(m_nw.get())->computeForce(target);
+            static_cast<BHQuadtreeNode*>(m_ne.get())->computeForce(target);
+            static_cast<BHQuadtreeNode*>(m_sw.get())->computeForce(target);
+            static_cast<BHQuadtreeNode*>(m_se.get())->computeForce(target);
         }
     }
 
-    void BHQuadtreeNode::addDirectForce(Body& target, const Body& source, float G) const {
+    void BHQuadtreeNode::addDirectForce(Body& target, const Body& source) const {
         const auto r = source.position() - target.position();
         const auto distanceSq = r.x * r.x + r.y * r.y;
         
@@ -81,7 +79,7 @@ namespace physics {
         target.addForce(forceVec);
     }
 
-    void BHQuadtreeNode::addApproximateForce(Body& target, const glm::vec2& comPos, float mass, float distance, float G) const {
+    void BHQuadtreeNode::addApproximateForce(Body& target, const glm::vec2& comPos, float mass, float distance) const {
         const auto r = comPos - target.position();
         const auto forceMag = G * target.mass() * mass / (distance * distance);
         const auto forceVec = forceMag * r / distance;
@@ -92,39 +90,36 @@ namespace physics {
 
     // BarnesHutSimulation
     //--------------------------------------------------------------------------------------
-    BarnesHutSimulation::BarnesHutSimulation(glm::vec2 visualArea)
+    NBodySimulation::NBodySimulation(glm::vec2 visualArea)
         : m_root(std::make_unique<BHQuadtreeNode>(
             AABB(glm::vec2(visualArea.x / 2, visualArea.y / 2), std::max(visualArea.x / 2, visualArea.y / 2) + AREA_PADDING))
             ) {
 
     }
 
-    void BarnesHutSimulation::setBodies(std::vector<std::shared_ptr<Body>>& bodies) {
+    void NBodySimulation::setBodies(std::vector<std::shared_ptr<Body>>& bodies) {
         m_bodies = bodies;
     }
 
-    void BarnesHutSimulation::addBodie(std::shared_ptr<Body> body) {
+    void NBodySimulation::addBodie(std::shared_ptr<Body> body) {
         m_bodies.push_back(body);
     }
     
     // Perform one simulation step
-    void BarnesHutSimulation::step(float dt) {
+    void NBodySimulation::step(float dt) {
         // Compute forces using Barnes-Hut algorithm
         for (auto& body : m_bodies) {
-            m_root->computeForce(*body, THETA, G_CONST);
+            m_root->computeForce(*body);
         }
         
         // Update positions and velocities using Leapfrog integration
         for (auto bodyIter = m_bodies.begin(); bodyIter != m_bodies.end(); /* no increment here */) {
-
             // Update velocity and position
             (*bodyIter)->update(dt);
             
             // Check boundaries (simple reflection)
-            const auto bottomRight = m_root->getBoundary().center + m_root->getBoundary().halfDimension;
-            const auto topLeft = m_root->getBoundary().center - m_root->getBoundary().halfDimension;
-            if ((*bodyIter)->position().x > bottomRight.x || (*bodyIter)->position().y > bottomRight.y
-                || (*bodyIter)->position().x < topLeft.x|| (*bodyIter)->position().y < topLeft.y) {
+            if (!m_root->getBoundary().containsPoint((*bodyIter)->position())) {
+                (*bodyIter)->setActive(false);
                 bodyIter = m_bodies.erase(bodyIter);
             }
             else {
@@ -136,8 +131,7 @@ namespace physics {
         rebuildTree();
     }
 
-            // Rebuild the quadtree with current bodies
-    void BarnesHutSimulation::rebuildTree() {
+    void NBodySimulation::rebuildTree() {
         const auto halfDimension = m_root->getBoundary().halfDimension;
         const auto center =m_root->getBoundary().center;
         m_root = std::make_unique<BHQuadtreeNode>(AABB(center, halfDimension));

@@ -38,18 +38,18 @@ struct AABB {
 template<typename T, typename Derived>
 class QuadtreeNode {
 public:
-    QuadtreeNode(const AABB& boundary);
+    explicit QuadtreeNode(const AABB& boundary);
 
     virtual bool insert(const glm::vec2& point, std::shared_ptr<T> data);
-    virtual bool insertToChild(const glm::vec2& point, std::shared_ptr<T> data);
     virtual bool remove(const glm::vec2& point);
-
-    std::unique_ptr<QuadtreeNode> createChildNode(const AABB& boundary);
     std::vector<std::shared_ptr<T>> queryRange(const AABB& range) const;
-    void queryRange(const AABB& range, std::vector<std::shared_ptr<T>>& found) const;
-    void subdivide();
 
 protected:
+    virtual bool insertToChild(const glm::vec2& point, std::shared_ptr<T> data);
+    std::unique_ptr<QuadtreeNode> createChildNode(const AABB& boundary);
+    void subdivide();
+    void queryRange(const AABB& range, std::vector<std::shared_ptr<T>>& found) const;
+
     AABB m_boundary;
     glm::vec2 m_point;
     std::shared_ptr<T> m_data;

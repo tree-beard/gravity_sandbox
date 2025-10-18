@@ -1,7 +1,7 @@
 #include <raylib.h>
-#include "bodies_generator.h"
-#include "physics/simulation_controller.h"
-#include "drawable_body.h"
+#include "utils/bodies_generator.h"
+#include "controllers/simulation_controller.h"
+#include "graphics/drawable_body.h"
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -28,8 +28,8 @@ int main(void)
     bodies.push_back(anotherBigBody);
     bodies.push_back(bigBody);
 
-    // Start simulation
-    auto simulation = std::make_unique<physics::SimulationController>(glm::vec2(screenWidth, screenHeight), bodies);
+    // Inintialize and start simulation
+    auto simulation = std::make_unique<SimulationController>(glm::vec2(screenWidth, screenHeight), bodies);
     simulation->start(0.01);
 
     // Main game loop
@@ -39,14 +39,7 @@ int main(void)
         // Draw
         //--------------------------------------------------------------------------------------
         BeginDrawing();
-
-        ClearBackground(BLACK);
-
-        for(auto body : bodies) {
-            std::static_pointer_cast<DrawableBody>(body)->draw();
-        }
-        std::string header = "Gravity simulation for " + std::to_string(bodies.size()) + " bodies";
-        DrawText(header.c_str(), 10, 10, 20, GREEN);
+        simulation->render();
         EndDrawing();
     }
 
