@@ -14,9 +14,11 @@ public:
 
     void setPosition(glm::vec2 position);
     void setVelocity(glm::vec2 velocity);
+    void setActive(bool active);
     glm::vec2 position() const;
     glm::vec2 force() const;
     float mass() const;
+    bool isActive() const;
     void addForce(const glm::vec2& force);
     bool operator==(const Body& other) const {
         return m_position == other.m_position
@@ -29,6 +31,7 @@ protected:
     glm::vec2 m_acceleration;
     glm::vec2 m_force;
     float m_mass;
+    std::atomic_bool m_active;
     mutable std::shared_timed_mutex m_mutex;
 };
 

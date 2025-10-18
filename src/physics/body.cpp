@@ -7,7 +7,8 @@ Body::Body(glm::vec2 _pos, glm::vec2 _vel, float _mass)
         : m_position(_pos)
         , m_velocity(_vel)
         , m_acceleration({})
-        , m_mass(_mass) {
+        , m_mass(_mass)
+        , m_active(true) {
 
 }
 
@@ -19,6 +20,10 @@ void Body::setPosition(glm::vec2 position) {
 void Body::setVelocity(glm::vec2 velocity) {
     //std::lock_guard<std::shared_timed_mutex> lock(m_mutex);
     m_velocity = velocity;
+}
+
+void Body::setActive(bool active) {
+    m_active = active;
 }
 
 glm::vec2 Body::position() const {
@@ -38,6 +43,10 @@ void Body::addForce(const glm::vec2& _force) {
 
 float Body::mass() const {
    return m_mass;
+}
+
+bool Body::isActive() const {
+    return m_active;
 }
 
 void Body::update(float dt) {
