@@ -48,6 +48,11 @@ public:
 
 private:
     void rebuildTree();
+    void computeForces();
+    void updatePositions(float dt);
+
+    using Chunk = std::pair<std::vector<std::shared_ptr<Body>>::iterator, std::vector<std::shared_ptr<Body>>::iterator>;
+    auto getChunks(std::vector<std::shared_ptr<Body>>& vec, size_t numCores, size_t minChunkSize) -> std::vector<Chunk> const;
 
     std::unique_ptr<BHQuadtreeNode> m_root;
     std::vector<std::shared_ptr<Body>> m_bodies;

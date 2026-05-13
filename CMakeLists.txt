@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 project("GravitySandbox")
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 set(UNIT_NAME GravitySandbox)
 
 set(SRCS
@@ -11,6 +15,7 @@ set(SRCS
     src/physics/nbody_simulation.cpp
     src/graphics/drawable_body.cpp
     src/utils/bodies_generator.cpp
+    src/utils/bodies_holder.cpp
 )
 set(HDRS
     src/base/quadtree.h
@@ -19,6 +24,7 @@ set(HDRS
     src/physics/nbody_simulation.h
     src/graphics/drawable_body.h
     src/utils/bodies_generator.h
+    src/utils/bodies_holder.h
 )
 
 if(NOT CMAKE_BUILD_TYPE)

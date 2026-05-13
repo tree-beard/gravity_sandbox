@@ -46,7 +46,7 @@ public:
 
 protected:
     virtual bool insertToChild(const glm::vec2& point, std::shared_ptr<T> data);
-    std::unique_ptr<QuadtreeNode> createChildNode(const AABB& boundary);
+    std::unique_ptr<Derived> createChildNode(const AABB& boundary);
     void subdivide();
     void queryRange(const AABB& range, std::vector<std::shared_ptr<T>>& found) const;
 

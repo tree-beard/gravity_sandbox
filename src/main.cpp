@@ -24,7 +24,7 @@ int main(void)
 
     // Add a couple of heave bodies
     auto bigBody = std::make_shared<DrawableBody>(glm::vec2(0.5 * screenWidth, 0.5 * screenHeight), glm::vec2(0,0), 100000, 7, GOLD);
-    auto anotherBigBody = std::make_shared<DrawableBody>(glm::vec2(0.5 * screenWidth + 100, 0.5 * screenHeight + 100), glm::vec2(0,0), 10000, 4, RED);
+    auto anotherBigBody = std::make_shared<DrawableBody>(glm::vec2(0.5 * screenWidth + 100, 0.5 * screenHeight + 100), glm::vec2(20,-10), 10000, 4, RED);
     bodies.push_back(anotherBigBody);
     bodies.push_back(bigBody);
 

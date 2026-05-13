@@ -12,6 +12,5 @@ DrawableBody::~DrawableBody() {
 }
     
 void DrawableBody::draw() {
-    std::shared_lock<std::shared_timed_mutex> lock(m_mutex);
     DrawCircleV({m_position.x, m_position.y}, m_radius, m_color);
 }

@@ -82,7 +82,7 @@ void QuadtreeNode<T, Derived>::subdivide() {
 }
 
 template<typename T, typename Derived>
-std::unique_ptr<QuadtreeNode<T, Derived>> QuadtreeNode<T, Derived>::createChildNode(const AABB& boundary) {
+std::unique_ptr<Derived> QuadtreeNode<T, Derived>::createChildNode(const AABB& boundary) {
     return std::make_unique<Derived>(boundary);
 }
 

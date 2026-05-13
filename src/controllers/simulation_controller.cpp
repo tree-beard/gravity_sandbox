@@ -42,13 +42,9 @@ void SimulationController::update(float dt) {
 void SimulationController::render() {
     ClearBackground(BLACK);
 
-    for (auto bodyIter = m_bodies.begin(); bodyIter != m_bodies.end(); /* no increment here */) {
-        if ((*bodyIter)->isActive()) {
-            (*bodyIter)->draw();
-            ++bodyIter;
-        }
-        else {
-            bodyIter = m_bodies.erase(bodyIter);
+    for (auto body : m_bodies) {
+        if (body->isActive()) {
+            body->draw();
         }
     }
     std::string header = "Gravity simulation for " + std::to_string(m_bodies.size()) + " bodies";

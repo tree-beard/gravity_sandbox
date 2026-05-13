@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glm/vec2.hpp>
-#include <shared_mutex>
 
 namespace physics {
 
@@ -27,12 +26,10 @@ public:
 
 protected:
     glm::vec2 m_position;
-    glm::vec2 m_velocity; 
-    glm::vec2 m_acceleration;
+    glm::vec2 m_velocity;
     glm::vec2 m_force;
     float m_mass;
-    std::atomic_bool m_active;
-    mutable std::shared_timed_mutex m_mutex;
+    bool m_active;
 };
 
 }

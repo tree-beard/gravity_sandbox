@@ -1,4 +1,5 @@
 #include "nbody_simulation.h"
+#include <future>
 
 namespace physics {
 
@@ -107,12 +108,30 @@ namespace physics {
     
     // Perform one simulation step
     void NBodySimulation::step(float dt) {
-        // Compute forces using Barnes-Hut algorithm
-        for (auto& body : m_bodies) {
-            m_root->computeForce(*body);
+        computeForces();
+        updatePositions(dt);
+        rebuildTree();
+    }
+
+    void NBodySimulation::computeForces() {
+        auto chunks = getChunks(m_bodies, std::thread::hardware_concurrency(), 100);
+        std::vector<std::future<void>> tasks;
+        for (auto& chunk : chunks) {
+             tasks.emplace_back(std::async([this, &chunk]() ->void {
+                    for(auto it = chunk.first; it < chunk.second; ++it) {
+                        m_root->computeForce(**it);
+                    }
+                })
+            );
         }
-        
-        // Update positions and velocities using Leapfrog integration
+
+        // Wait for all async tasks to complete
+        for (auto& task : tasks) {
+            task.get();
+        }
+    }
+
+    void NBodySimulation::updatePositions(float dt) {
         for (auto bodyIter = m_bodies.begin(); bodyIter != m_bodies.end(); /* no increment here */) {
             // Update velocity and position
             (*bodyIter)->update(dt);
@@ -126,9 +145,6 @@ namespace physics {
                 ++bodyIter;
             }
         }
-        
-        // Rebuild tree with new positions
-        rebuildTree();
     }
 
     void NBodySimulation::rebuildTree() {
@@ -139,5 +155,37 @@ namespace physics {
         for (auto& body : m_bodies) {
             m_root->insert(body);
         }
+    }
+
+    auto NBodySimulation::getChunks(std::vector<std::shared_ptr<Body>>& vec
+                                                                    , size_t numCores
+                                                                    , size_t minChunkSize) -> std::vector<Chunk> const {
+        std::vector<Chunk> chunks;
+        if (vec.empty() || numCores == 0 || minChunkSize == 0) {
+            return chunks;
+        }
+
+        const auto totalSize = vec.size();
+        auto chunkSize = std::max(minChunkSize, (totalSize + numCores - 1) / numCores);
+        chunkSize = std::max(chunkSize, minChunkSize);
+        const auto numChunks = (totalSize + chunkSize - 1) / chunkSize;
+
+        auto start = vec.begin();
+        for (size_t i = 0; i < numChunks; ++i) {
+            auto end = start;
+            auto remaining = totalSize - (start - vec.begin());
+            auto currentChunkSize = std::min(chunkSize, remaining);
+
+            if (currentChunkSize < minChunkSize && i < numChunks - 1) {
+                currentChunkSize = minChunkSize;
+            }
+
+            std::advance(end, currentChunkSize);
+            chunks.emplace_back(start, end);
+            start = end;
+
+            if (start == vec.end()) break;
+        }
+        return chunks;
     }
 }

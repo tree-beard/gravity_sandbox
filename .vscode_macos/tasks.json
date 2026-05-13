@@ -1,5 +1,14 @@
 {
   "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "buildType",
+      "type": "pickString",
+      "description": "Select build type",
+      "options": ["Debug", "Release"],
+      "default": "Release"
+    }
+  ],
   "tasks": [
     {
       "label": "cmake",
@@ -10,7 +19,7 @@
         "${workspaceFolder}",
         "-B",
         "${workspaceFolder}/build",
-        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_BUILD_TYPE=${input:buildType}",
         "-DRELEASE_WITH_DSYM=ON",
         "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
         "-DCMAKE_BINARY_DIR=${workspaceFolder}/build",
@@ -25,7 +34,7 @@
     {
       "label": "build",
       "type": "shell",
-      "command": "cmake --build ${workspaceFolder}/build --config Release --target GravitySandbox --parallel $(sysctl -n hw.ncpu)",
+      "command": "cmake --build ${workspaceFolder}/build --config ${input:buildType} --target GravitySandbox --parallel $(sysctl -n hw.ncpu)",
       "group": {
         "kind": "build",
         "isDefault": true
